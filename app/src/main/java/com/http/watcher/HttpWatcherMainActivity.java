@@ -1,17 +1,27 @@
 package com.http.watcher;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.security.KeyChain;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
+
+import net.lightbody.bmp.core.har.HarEntry;
+
+import java.io.InputStream;
+import java.util.List;
 
 public class HttpWatcherMainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -40,6 +50,44 @@ public class HttpWatcherMainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        installCert();
+
+    }
+
+    public void installCert() {
+        final String CERTIFICATE_RESOURCE = "/sslSupport/ca-certificate-rsa.cer";
+        Boolean isInstallCert = false;
+
+        if (!isInstallCert) {
+            Toast.makeText(this, "必须安装证书才可实现HTTPS抓包", Toast.LENGTH_LONG).show();
+            try {
+                byte[] keychainBytes;
+                InputStream bis = this.getClass().getResourceAsStream(CERTIFICATE_RESOURCE);
+                keychainBytes = new byte[bis.available()];
+                bis.read(keychainBytes);
+
+                Intent intent = KeyChain.createInstallIntent();
+                intent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychainBytes);
+                intent.putExtra(KeyChain.EXTRA_NAME, "NetworkDiagnosis CA Certificate");
+                startActivityForResult(intent, 3);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 3) {
+            if (resultCode == Activity.RESULT_OK) {
+//                SharedPreferenceUtils.putBoolean(this,"isInstallCert", true);
+                Toast.makeText(this, "安装成功", Toast.LENGTH_LONG).show();
+
+            } else {
+                Toast.makeText(this, "安装失败", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -97,5 +145,18 @@ public class HttpWatcherMainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (WatcherApplication.getMobProxy() != null){
+            List<HarEntry> entry = WatcherApplication.getMobProxy().getHar().getLog().getEntries();
+            for (HarEntry har: entry){
+                Log.d("HAR", har.getRequest().getUrl() + "   response:" + har.getResponse().getStatusText());
+            }
+        }
+
     }
 }
