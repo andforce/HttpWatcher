@@ -2,12 +2,13 @@ apply plugin: 'com.android.application'
 
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.0"
+
     defaultConfig {
         applicationId "com.http.watcher"
         minSdkVersion 19
-        targetSdkVersion 25
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -33,17 +34,17 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
-    compile group: 'net.lightbody.bmp', name: 'browsermob-core', version: '2.1.4'
+    implementation group: 'net.lightbody.bmp', name: 'browsermob-core', version: '2.1.4'
 
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 
 
 }

@@ -2,8 +2,9 @@ package com.http.watcher;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.multidex.MultiDexApplication;
 import android.util.Log;
+
+import androidx.multidex.MultiDexApplication;
 
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
